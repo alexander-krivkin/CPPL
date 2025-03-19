@@ -7,6 +7,19 @@ ak::SmartArray::SmartArray(int size) :
 	data = new int[physicalSize] {};
 }
 
+ak::SmartArray::SmartArray(const ak::SmartArray& obj)
+{
+	physicalSize = obj.physicalSize;
+	logicalSize = obj.logicalSize;
+
+	data = new int[physicalSize] {};
+
+	for (int idx{}; idx < logicalSize; idx++)
+	{
+		data[idx] = obj.data[idx];
+	}
+}
+
 ak::SmartArray::~SmartArray()	
 {
 	physicalSize = 0;

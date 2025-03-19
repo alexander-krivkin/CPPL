@@ -13,7 +13,6 @@ int main()
 	try
 	{
 		ak::SmartArray arr(3);
-		ak::SmartArray new_array(2);
 
 		arr.addElement(1);
 		arr.addElement(4);
@@ -21,6 +20,8 @@ int main()
 		arr.addElement(14);
 		arr.addElement(15);
 		arr.print();
+
+		ak::SmartArray new_array(arr);
 
 		new_array.addElement(44);
 		new_array.addElement(34);

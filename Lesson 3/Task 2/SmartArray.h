@@ -10,6 +10,7 @@ namespace ak
 	{
 	public:
 		SmartArray(int size);
+		SmartArray(const SmartArray& obj);
 		~SmartArray();
 
 		SmartArray& operator=(const SmartArray& rhs);
