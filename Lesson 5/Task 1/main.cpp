@@ -4,29 +4,26 @@
 #include <Windows.h>
 
 
-template <typename T1>
-void squareAndPrint(T1 arg)
+namespace ak
 {
-	std::cout << "[IN]: " << arg << std::endl;
-	std::cout << "[OUT]: " << arg * arg << std::endl;
-}
-
-template <typename T2>
-void squareAndPrint(std::vector<T2> arg)
-{
-	std::cout << "[IN]: ";
-	for (auto& elem : arg)
+	template <typename T>
+	T square(const T& arg)
 	{
-		std::cout << elem << " ";
+		return arg * arg;
 	}
-	std::cout << std::endl;
 
-	std::cout << "[OUT]: ";
-	for (auto& elem : arg)
+	template <typename T>
+	std::vector<T> square(const std::vector<T>& arg)
 	{
-		std::cout << elem * elem << " ";
+		std::vector<T> ret{ arg };
+
+		for (auto& elem : ret)
+		{
+			elem *= elem;
+		}
+
+		return ret;
 	}
-	std::cout << std::endl;
 }
 
 
@@ -39,13 +36,23 @@ int main()
 	int i2{ 35 };
 	double f1{ 22.11 };
 	std::vector<int> vec1{ 1, 4, 8, 365 };
-	std::vector<float> vec2{ 1.1, 4.2, 8.3, 365.4 };
 
-	squareAndPrint(i1);
-	squareAndPrint(i2);
-	squareAndPrint(f1);
-	squareAndPrint(vec1);
-	squareAndPrint(vec2);
+	std::cout << "[IN]: " << i1 << std::endl;
+	std::cout << "[OUT]: " << ak::square(i1) << std::endl;
+	std::cout << "[IN]: " << i2 << std::endl;
+	std::cout << "[OUT]: " << ak::square(i2) << std::endl;
+	std::cout << "[IN]: " << f1 << std::endl;
+	std::cout << "[OUT]: " << ak::square(f1) << std::endl;
+
+	std::cout << "[IN]: ";
+	std::copy(vec1.begin(), vec1.end(), std::ostream_iterator<int>(std::cout, " "));
+	std::cout << std::endl;
+
+	std::vector<int> vec1squared{ ak::square(vec1) };
+
+	std::cout << "[OUT]: ";
+	std::copy(vec1squared.begin(), vec1squared.end(), std::ostream_iterator<int>(std::cout, " "));
+	std::cout << std::endl;
 
 	std::cout << std::endl << std::endl;
 	system("pause");

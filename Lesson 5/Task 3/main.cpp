@@ -6,35 +6,25 @@
 #include <Windows.h>
 
 
-class GetSumFunctor final
+class CounterFunctor final
 {
 public:
-	GetSumFunctor() : sum(0) {}
+	CounterFunctor() : sum(0), count(0) {}
 
 	void operator()(int arg)
 	{
-		if (!(arg % 3)) sum += arg;
+		if (!(arg % 3))
+		{
+			sum += arg;
+			count++;
+		}
 	}
 
 	int GetSum() const { return sum; }
-
-private:
-	int sum;
-};
-
-class GetCountFunctor final
-{
-public:
-	GetCountFunctor() : count(0) {}
-
-	void operator()(int arg)
-	{
-		if (!(arg % 3)) count++;
-	}
-
 	int GetCount() const { return count; }
 
 private:
+	int sum;
 	int count;
 };
 
@@ -47,20 +37,13 @@ int main()
 	std::vector<int> vec1{ 4, 1, 3, 6, 25, 54, 55, 123, 150, 222 };
 
 	std::cout << "[IN]: ";
-	for (auto& elem : vec1)
-	{
-		std::cout << elem << " ";
-	}
+	std::copy(vec1.begin(), vec1.end(), std::ostream_iterator<int>(std::cout, " "));
 	std::cout << std::endl;
 
-	GetSumFunctor getSumFunctor;
-	GetCountFunctor getCountFunctor;
+	CounterFunctor counter = std::for_each(vec1.begin(), vec1.end(), CounterFunctor());
 
-	std::for_each(vec1.begin(), vec1.end(), std::ref(getSumFunctor));
-	std::for_each(vec1.begin(), vec1.end(), std::ref(getCountFunctor));
-
-	std::cout << "[OUT]: getSum() = " << getSumFunctor.GetSum() << std::endl;
-	std::cout << "[OUT]: getCount() = " << getCountFunctor.GetCount() << std::endl;
+	std::cout << "[OUT]: getSum() = " << counter.GetSum() << std::endl;
+	std::cout << "[OUT]: getCount() = " << counter.GetCount() << std::endl;
 
 	std::cout << std::endl << std::endl;
 	system("pause");

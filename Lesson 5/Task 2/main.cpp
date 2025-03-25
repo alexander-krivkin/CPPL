@@ -4,7 +4,7 @@
 
 
 template <typename T>
-class Table
+class Table final
 {
 public:
 	Table(int sizeX, int sizeY) : sizeX(sizeX), sizeY(sizeY)
@@ -14,6 +14,54 @@ public:
 		for (int idxX{}; idxX < sizeX; idxX++)
 		{
 			data[idxX] = new T[sizeY]{};
+		}
+	}
+
+	Table(const Table& obj)
+	{
+		sizeX = obj.sizeX;
+		sizeY = obj.sizeY;
+
+		data = new T * [sizeX] {};
+
+		for (int idxX{}; idxX < sizeX; idxX++)
+		{
+			data[idxX] = new T[sizeY]{};
+
+			for (int idxY{}; idxY < sizeY; idxY++)
+			{
+				data[idxX][idxY] = obj.data[idxX][idxY];
+			}
+		}
+	}
+
+	Table& operator=(const Table& obj)
+	{
+		if (this == &obj)
+		{
+			return *this;
+		}
+
+		for (int idxX{}; idxX < sizeX; idxX++)
+		{
+			delete[] data[idxX];
+		}
+
+		delete[] data;
+
+		sizeX = obj.sizeX;
+		sizeY = obj.sizeY;
+
+		data = new T * [sizeX] {};
+
+		for (int idxX{}; idxX < sizeX; idxX++)
+		{
+			data[idxX] = new T[sizeY]{};
+
+			for (int idxY{}; idxY < sizeY; idxY++)
+			{
+				data[idxX][idxY] = obj.data[idxX][idxY];
+			}
 		}
 	}
 
@@ -49,6 +97,10 @@ public:
 	{
 	public:
 		Proxy(T* data) : data(data) {}
+		const T& operator[] (int idx) const
+		{
+			return data[idx];
+		}
 		T& operator[] (int idx)
 		{
 			return data[idx];
