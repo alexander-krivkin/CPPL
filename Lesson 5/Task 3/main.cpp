@@ -9,7 +9,7 @@
 class GetSumFunctor final
 {
 public:
-	GetSumFunctor() {}
+	GetSumFunctor() : sum(0) {}
 
 	void operator()(int arg)
 	{
@@ -19,13 +19,13 @@ public:
 	int GetSum() const { return sum; }
 
 private:
-	static int sum;
+	int sum;
 };
 
 class GetCountFunctor final
 {
 public:
-	GetCountFunctor() {}
+	GetCountFunctor() : count(0) {}
 
 	void operator()(int arg)
 	{
@@ -35,12 +35,8 @@ public:
 	int GetCount() const { return count; }
 
 private:
-	static int count;
+	int count;
 };
-
-
-int GetSumFunctor::sum = 0;
-int GetCountFunctor::count = 0;
 
 
 int main()
@@ -60,8 +56,8 @@ int main()
 	GetSumFunctor getSumFunctor;
 	GetCountFunctor getCountFunctor;
 
-	std::for_each(vec1.begin(), vec1.end(), getSumFunctor);
-	std::for_each(vec1.begin(), vec1.end(), getCountFunctor);
+	std::for_each(vec1.begin(), vec1.end(), std::ref(getSumFunctor));
+	std::for_each(vec1.begin(), vec1.end(), std::ref(getCountFunctor));
 
 	std::cout << "[OUT]: getSum() = " << getSumFunctor.GetSum() << std::endl;
 	std::cout << "[OUT]: getCount() = " << getCountFunctor.GetCount() << std::endl;
