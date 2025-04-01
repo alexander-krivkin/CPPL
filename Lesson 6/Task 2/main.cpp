@@ -6,10 +6,6 @@
 #include <Windows.h>
 
 
-bool comp(std::pair<char, int>& a, std::pair<char, int>& b) {
-	return a.second > b.second;
-}
-
 int main()
 {
 	SetConsoleCP(1251);
@@ -19,14 +15,13 @@ int main()
 
 	std::cout << "[IN]: " << std::endl;
 	std::cin >> num;
-	std::vector<int> v1{};
 	std::set <int, std::greater<int>> s1{};
-	v1.resize(num);
 
 	for (size_t idx{}; idx < num; idx++)
 	{
-		std::cin >> v1.at(idx);
-		s1.emplace(v1.at(idx));
+		int n{};
+		std::cin >> n;
+		s1.insert(n);
 	}
 
 	std::cout << std::endl << "[OUT]: " << std::endl;
