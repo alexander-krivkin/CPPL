@@ -25,6 +25,8 @@ namespace ak
 		std::string getData() const { return data; }
 		BigInt operator+(const BigInt& val) const;
 		BigInt operator-(const BigInt& val) const;
+		friend BigInt operator*(const int iVal, const BigInt& val);
+		BigInt operator*(const int iVal) const;
 		BigInt operator*(const BigInt& val) const; // Реализация алгоритма Карацубы
 
 	private:

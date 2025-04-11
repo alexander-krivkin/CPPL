@@ -107,10 +107,22 @@ namespace ak
 		return bigIntRet;
 	}
 
+	BigInt BigInt::operator*(const int iVal) const
+	{
+		BigInt ret = (*this) * BigInt(std::to_string(iVal));
+		return ret;
+	}
+
+	BigInt operator*(const int iVal, const BigInt& val)
+	{
+		BigInt ret = val * BigInt(std::to_string(iVal));
+		return ret;
+	}
+
 	BigInt BigInt::operator*(const BigInt& val) const
 	{
-		int n_this = data.length();
-		int n_val = val.data.length();
+		int n_this = static_cast<int>(data.length());
+		int n_val = static_cast<int>(val.data.length());
 
 		if ((n_this == 1) && (n_val == 1))
 		{
@@ -121,7 +133,7 @@ namespace ak
 		}
 
 		int max_log2 = static_cast<int>(max(ceil(log2(data.length())), ceil(log2(val.data.length()))));
-		int n = pow(2, max_log2);
+		int n = static_cast<int>(pow<int, int>(2, max_log2));
 		int n_2 = n / 2;
 
 		std::string x(n - n_this, '0');

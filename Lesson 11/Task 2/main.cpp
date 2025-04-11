@@ -6,7 +6,7 @@ int main()
 	{
 		auto number1 = ak::BigInt("114575");
 		auto number2 = ak::BigInt("78524");
-		auto result = number1 * number2;
+		auto result = 2 * number2 * 2;
 
 		auto number3 = std::move(result);
 		std::cout << number3 << std::endl;
