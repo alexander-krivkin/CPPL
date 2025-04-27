@@ -13,8 +13,8 @@ int main()
 		ak::IniParser iniParser("file.ini");
 
 		std::string query{ "Section1.var1" };
-		auto value = iniParser.getValue<double>(query);
-		std::cout << query << ": value = " << value;
+		auto value = iniParser.getValue<float>(query);
+		std::cout << query << " = " << value;
 	}
 	catch (const std::exception& ex)
 	{

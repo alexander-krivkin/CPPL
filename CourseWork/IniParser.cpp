@@ -3,8 +3,8 @@
 
 namespace ak
 {
-	std::vector<std::string> syntaxTypeName { "ERR", "INIT_SECTION", "INIT_INT", "INIT_DOUBLE", "INIT_STRING", "INIT_UNDEFINED" };
-	std::vector<std::string> syntaxStatusName{ "", " - ERR_INVALID_NAME", " - ERR_NO_DEFINITION", " - ERR_UNEXPECTED_SYMBOLS" };
+	std::vector<std::string> syntaxName{ "ok: init section", "ok: init variable",
+		"Error: invalid name", "Error: no defifnition", "Error: unexpected symbols" };
 
 	bool isLetterDigit(const char& ch) {
 		return (((ch >= 'A') && (ch <= 'Z')) ||
@@ -60,9 +60,7 @@ namespace ak
 		int idx{};
 		for (const auto& elem : syntax_)
 		{
-			std::cout << std::setw(3) << ++idx << ": " <<
-				syntaxTypeName[static_cast<int>(elem.first)] <<
-				syntaxStatusName[static_cast<int>(elem.second)] << std::endl;
+			std::cout << std::setw(3) << ++idx << ": " << syntaxName[static_cast<int>(elem)] << std::endl;
 		}
 	}
 
@@ -71,27 +69,9 @@ namespace ak
 		for (const auto& key : container_)
 		{
 			std::cout << "[" << key.first << "]" << std::endl;
-
 			for (const auto& elem : key.second)
 			{
-				std::cout << '\t' << elem.first;
-				switch (elem.second.index())
-				{
-				case 0:
-					std::cout << " (int) = " <<
-						std::get<int>(elem.second) << std::endl;
-					break;
-				case 1:
-					std::cout << " (double) = " <<
-						std::get<double>(elem.second) << std::endl;
-					break;
-				case 2:
-					std::cout << " (string) = " <<
-						std::get<std::string>(elem.second) << std::endl;
-					break;
-				default:
-					break;
-				}
+				std::cout << "    " << elem.first << " = " << elem.second << std::endl;
 			}
 		}
 	}
@@ -155,28 +135,24 @@ namespace ak
 
 	void IniParser::parseData()
 	{
-		syntax_.resize(lines_.size());
-		auto syntax_it = syntax_.begin();
 		std::string currentSection{ "Empty" };
 		std::string currentVariable{};
 		std::string currentVariableValue{};
+		
+		syntax_.resize(lines_.size());
+		std::fill(syntax_.begin(), syntax_.end(), Syntax::eErrNoDefinition);
+		int syntaxIdx{};
 
 		for (const auto& elem : lines_)
 		{
-			// l - заглавные и прописные символы латинского алфавита и цифры
-			// n - цифры
-			// x - любые символы
-
-			// 1. Проверка синтаксиса "[l]"
+			// Секции
 			auto lines_it = std::find(elem.begin(), elem.end(), '[');
 			auto lines_it_end = std::find(lines_it, elem.end(), ']');
 			if ((lines_it != elem.end()) && (lines_it_end != elem.end()))
 			{
-				syntax_it->first = SyntaxType::INIT_SECTION;
-
 				if (std::find_if_not(lines_it + 1, lines_it_end, isLetterDigit) == lines_it_end)
 				{
-					syntax_it->second = SyntaxStatus::OK;					
+					syntax_[syntaxIdx] = Syntax::eInitSection;
 					currentSection = std::string(lines_it + 1, lines_it_end);
 
 					if (!container_[currentSection].size())
@@ -186,11 +162,11 @@ namespace ak
 				}
 				else
 				{
-					syntax_it->second = SyntaxStatus::ERR_INVALID_NAME;
+					syntax_[syntaxIdx] = Syntax::eErrInvalidName;
 				}
 			}
 
-			// 2. Проверка синтаксисов "l=n" "l=n.n" "l=x"
+			// Переменные
 			lines_it = std::find(elem.begin(), elem.end(), '=');
 			if (lines_it != elem.end())
 			{
@@ -200,42 +176,22 @@ namespace ak
 				}
 				else
 				{
-					syntax_it->second = SyntaxStatus::ERR_INVALID_NAME;
+					syntax_[syntaxIdx] = Syntax::eErrInvalidName;
 				}
 
 				currentVariableValue = std::string(lines_it + 1, elem.end());
-				if (!currentVariableValue.length())
+				if (currentVariableValue.length())
 				{
-					syntax_it->first = SyntaxType::INIT_UNDEFINED;
-					syntax_it->second = SyntaxStatus::ERR_NO_DEFINITION;
-				}
-				else if (std::find_if_not(currentVariableValue.begin(), currentVariableValue.end(), isDigit) ==
-					currentVariableValue.end())
-				{
-					syntax_it->first = SyntaxType::INIT_INT;
-					syntax_it->second = SyntaxStatus::OK;
-					int val = std::stoi(currentVariableValue);
-					container_[currentSection][currentVariable] = val;
-				}
-				else if (std::find_if_not(currentVariableValue.begin(), currentVariableValue.end(), isDigitDot) ==
-					currentVariableValue.end())
-				{
-					syntax_it->first = SyntaxType::INIT_DOUBLE;
-					syntax_it->second = SyntaxStatus::OK;
-					double val = std::stod(currentVariableValue);
-					container_[currentSection][currentVariable] = val;
+					syntax_[syntaxIdx] = Syntax::eInitVariable;
+					container_[currentSection][currentVariable] = currentVariableValue;
 				}
 				else
 				{
-					syntax_it->first = SyntaxType::INIT_STRING;
-					syntax_it->second = SyntaxStatus::OK;
-					container_[currentSection][currentVariable] = currentVariableValue;
+					syntax_[syntaxIdx] = Syntax::eErrNoDefinition;
 				}
 			}
 
-			// 3. Любой другой вариант - ошибка синтаксиса
-
-			syntax_it++;
+			syntaxIdx++;
 		}
 	}
 }

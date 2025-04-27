@@ -13,25 +13,13 @@
 
 namespace ak
 {
-	enum class SyntaxType
+	enum class Syntax
 	{
-		ERR = 0,
-		INIT_SECTION = 1,
-		INIT_INT = 2,
-		INIT_DOUBLE = 3,
-		INIT_STRING = 4,
-		INIT_UNDEFINED = 5
-	};
-	enum class SyntaxStatus
-	{
-		OK = 0,
-		ERR_INVALID_NAME = 1,
-		ERR_NO_DEFINITION = 2,
-		ERR_UNEXPECTED_SYMBOLS = 3,
-
-		ERR_INVALID_NAME_AND_NO_DEFINITION = 11,
-		ERR_INVALID_NAME_AND_UNEXPECTED_SYMBOLS = 12,
-		ERR_TYPE_CHANGED_AND_UNEXPECTED_SYMBOLS = 13
+		eInitSection = 0,
+		eInitVariable = 1,
+		eErrInvalidName = 2,
+		eErrNoDefinition = 3,
+		eErrUnexpectedSymbols = 4
 	};
 
 	bool isLetterDigit(const char& ch);
@@ -49,11 +37,31 @@ namespace ak
 		template <typename T>
 		T getValue(std::string query)
 		{
-			auto it = std::find(query.begin(), query.end(), '.');
-			std::string section(query.begin(), it);
-			std::string variable(it + 1, query.end());
+			static_assert(sizeof(T) == -1, "not implemented type for getValue");
+		}
 
-			return std::get<T>(container_[section][variable]);
+		template <>
+		int getValue(std::string query)
+		{
+			return std::atoi(getStringValue_(query).data());
+		}
+
+		template <>
+		float getValue(std::string query)
+		{
+			return static_cast<float>(std::atof(getStringValue_(query).data()));
+		}
+
+		template <>
+		double getValue(std::string query)
+		{
+			return std::atof(getStringValue_(query).data());
+		}
+
+		template <>
+		std::string getValue(std::string query)
+		{
+			return getStringValue_(query);
 		}
 
 	private:
@@ -64,11 +72,18 @@ namespace ak
 		void cleanRawLines();
 		void parseData();
 
+		std::string getStringValue_(std::string query)
+		{
+			auto it = std::find(query.begin(), query.end(), '.');
+			std::string section(query.begin(), it);
+			std::string variable(it + 1, query.end());
+
+			return container_[section][variable];
+		}
+
 		std::vector<std::string> rawLines_{};
 		std::vector<std::string> lines_{};
-		std::vector <std::pair<SyntaxType, SyntaxStatus>> syntax_{};
-
-		typedef std::map<std::string, std::variant<int, double, std::string>> tMapVariants;
-		std::map<std::string, tMapVariants> container_{};
+		std::vector <Syntax> syntax_{};
+		std::map<std::string, std::map<std::string, std::string>> container_{};
 	};
 }
