@@ -43,19 +43,19 @@ namespace ak
 		template <>
 		int getValue(std::string query)
 		{
-			return std::atoi(getStringValue_(query).data());
+			return std::stoi(getStringValue_(query));
 		}
 
 		template <>
 		float getValue(std::string query)
 		{
-			return static_cast<float>(std::atof(getStringValue_(query).data()));
+			return std::stof(getStringValue_(query));
 		}
 
 		template <>
 		double getValue(std::string query)
 		{
-			return std::atof(getStringValue_(query).data());
+			return std::stod(getStringValue_(query));
 		}
 
 		template <>
